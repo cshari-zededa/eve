@@ -1,29 +1,19 @@
-# Ubuntu Base Package for EVE
-# Simplified version focusing on essential tools only
+# Ubuntu Base Package for EVE - Ultra Minimal
+# This provides just the Ubuntu 24.04 base + helper script
+# Individual packages will install their own dependencies
 
-FROM ubuntu:24.04 AS base
+FROM ubuntu:24.04
 
 ARG UBUNTU_VERSION=24.04
-ARG TARGETARCH
-
-# Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Minimal setup - just copy the helper script
+# Only copy the helper script - no network access needed
 COPY eve-ubuntu-deploy.sh /usr/bin/
 RUN chmod +x /usr/bin/eve-ubuntu-deploy.sh
 
-# Install Go from binary (no apt needed for this)
-ARG GO_VERSION=1.23.5
-RUN arch=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && \
-    mkdir -p /tmp/go && \
-    cd /tmp/go && \
-    wget -q "https://go.dev/dl/go${GO_VERSION}.linux-${arch}.tar.gz" && \
-    tar -C /usr/local -xzf "go${GO_VERSION}.linux-${arch}.tar.gz" && \
-    rm -rf /tmp/go
-
+# Set environment
 ENV PATH="/usr/local/go/bin:${PATH}"
-ENV GOPATH=/go
+ENV GOPATH=/go  
 ENV GOTOOLCHAIN=local
 
 WORKDIR /
