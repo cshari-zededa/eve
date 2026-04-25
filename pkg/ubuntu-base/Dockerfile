@@ -1,7 +1,7 @@
 # Ubuntu Base Package for EVE
-# This replaces eve-alpine-base with Ubuntu 24.04
+# Simplified version focusing on essential tools only
 
-FROM ubuntu:24.04 AS base-build
+FROM ubuntu:24.04 AS base
 
 ARG UBUNTU_VERSION=24.04
 ARG TARGETARCH
@@ -9,53 +9,22 @@ ARG TARGETARCH
 # Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and install essential build tools
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-        wget \
-        gnupg \
-        apt-utils \
-        build-essential \
-        pkg-config \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy helper scripts
+# Minimal setup - just copy the helper script
 COPY eve-ubuntu-deploy.sh /usr/bin/
 RUN chmod +x /usr/bin/eve-ubuntu-deploy.sh
 
-# Install Go (matching the version EVE uses)
+# Install Go from binary (no apt needed for this)
 ARG GO_VERSION=1.23.5
-RUN arch=$(dpkg --print-architecture) && \
-    curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${arch}.tar.gz" | \
-    tar -C /usr/local -xzf -
+RUN arch=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && \
+    mkdir -p /tmp/go && \
+    cd /tmp/go && \
+    wget -q "https://go.dev/dl/go${GO_VERSION}.linux-${arch}.tar.gz" && \
+    tar -C /usr/local -xzf "go${GO_VERSION}.linux-${arch}.tar.gz" && \
+    rm -rf /tmp/go
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH=/go
 ENV GOTOOLCHAIN=local
 
-# Create directory structure
-RUN mkdir -p /mirror/${UBUNTU_VERSION}/rootfs
-
-# Stage 2: Architecture-specific builds
-FROM base-build AS build-amd64
-ARG TARGETARCH=amd64
-ENV ZARCH=amd64
-
-FROM base-build AS build-arm64  
-ARG TARGETARCH=arm64
-ENV ZARCH=arm64
-
-FROM base-build AS build-riscv64
-ARG TARGETARCH=riscv64
-ENV ZARCH=riscv64
-
-# Stage 3: Final image
-FROM build-${TARGETARCH} AS final
-
-# Set working directory
 WORKDIR /
-
-# Default shell
 CMD ["/bin/bash"]
