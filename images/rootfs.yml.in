@@ -1,5 +1,5 @@
 kernel:
-  image: docker.io/lfedge/eve-kernel-ubuntu22:9b429c8c9091f14f9343fba35e77b177fba3f271
+  image: docker.io/lfedge/eve-kernel-ubuntu:7da857a53dc5ee76d4c22df8d9ce95d6f7f5f95c
   # the unified_cgroup_hierarchy forces cgroupsv1, which is required until pillar is ready to support v2
   cmdline: "rootdelay=3 linuxkit.unified_cgroup_hierarchy=0"
 init:
