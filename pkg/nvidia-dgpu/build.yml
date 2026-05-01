@@ -1,0 +1,21 @@
+# linuxkit build template for NVIDIA dGPU userspace
+#
+# Copyright (c) 2026 Zededa, Inc.
+# SPDX-License-Identifier: Apache-2.0
+#
+org: lfedge
+image: eve-nvidia-dgpu
+config:
+  binds:
+    - /lib/modules:/lib/modules
+    - /dev:/dev
+    - /run:/run
+    - /persist:/persist
+    - /:/hostfs
+  capabilities:
+    - all
+  pid: host
+  rootfsPropagation: shared
+  devices:
+    - path: all
+      type: a
