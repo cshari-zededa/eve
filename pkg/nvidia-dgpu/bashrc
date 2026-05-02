@@ -1,0 +1,26 @@
+# ~/.bashrc for nvidia-dgpu container
+
+# Prompt: [nvidia-dgpu] root@hostname:/path$
+PS1='\[\033[1;32m\][nvidia-dgpu]\[\033[0m\] \u@\h:\w\$ '
+
+# Environment
+export PATH="/usr/local/cuda/bin:/usr/bin:/usr/local/bin:/usr/sbin:/sbin:${PATH}"
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/cuda/lib64"
+export CUDA_HOME="/usr/local/cuda"
+
+# Tab completion
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
+# Aliases
+alias ll="ls -la"
+alias la="ls -A"
+alias l="ls -CF"
+
+# Color support for ls
+if [ -x /usr/bin/dircolors ]; then
+    eval "$(dircolors -b)"
+    alias ls="ls --color=auto"
+    alias grep="grep --color=auto"
+fi

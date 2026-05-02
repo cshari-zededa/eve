@@ -1,0 +1,11 @@
+# ~/.profile for nvidia-dgpu container
+# When eve enter runs /bin/sh -l, this sources .bashrc and execs bash
+
+if [ -n "$BASH_VERSION" ]; then
+    if [ -f "$HOME/.bashrc" ]; then
+        . "$HOME/.bashrc"
+    fi
+elif [ -x /bin/bash ]; then
+    export ENV="$HOME/.bashrc"
+    exec /bin/bash --login
+fi

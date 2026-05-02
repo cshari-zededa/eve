@@ -65,6 +65,12 @@ COPY --from=extract /staging/ /
 # Run ldconfig to register NVIDIA libraries
 RUN ldconfig
 
+# Set up bash as default shell with proper prompt and tab completion
+COPY bashrc /root/.bashrc
+COPY profile /root/.profile
+# Make /bin/sh point to bash so eve enter gets proper prompt and tab completion
+RUN ln -sf /bin/bash /bin/sh
+
 # Set environment
 ENV PATH="/usr/local/cuda/bin:/usr/bin:/usr/local/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/cuda/lib64"
