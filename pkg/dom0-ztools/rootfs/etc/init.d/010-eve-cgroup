@@ -14,7 +14,7 @@ EVESERVICES="sshd eve-edgeview wwan lisp guacd pillar vtpm watchdog xen-tools ne
 #Increase memory limits temporarily for 'k' type only.
 case $hv in
    k)
-       default_cgroup_memory_limit=8388608000 #8G
+       default_cgroup_memory_limit=21474836480 #20G
        EVESERVICES="${EVESERVICES} kube"
        ;;
 esac
@@ -120,6 +120,13 @@ for srv in $EVESERVICES; do
         /bin/echo "0-$((eve_cgroup_cpus_limit-1))" > /sys/fs/cgroup/cpuset/eve/services/"${srv}"/cpuset.mems
     fi
 done
+
+# Override kube service memory limit to 15G (for k3s + GPU workloads)
+if [ -d /sys/fs/cgroup/memory/eve/services/kube ]; then
+    kube_cgroup_memory_limit=16106127360 #15G
+    /bin/echo $kube_cgroup_memory_limit > /sys/fs/cgroup/memory/eve/services/kube/memory.limit_in_bytes
+    echo "Set kube cgroup memory limit to $kube_cgroup_memory_limit (15G)"
+fi
 
 # Set memory soft limits if supported (not available on RT kernels where
 # writes to memory.soft_limit_in_bytes return -EOPNOTSUPP)
